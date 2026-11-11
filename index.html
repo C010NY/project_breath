@@ -1,0 +1,746 @@
+<!DOCTYPE html>
+<html lang="ja">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>呼吸 × 反応速度 Ver2.5</title>
+  <style>
+    * {
+      box-sizing: border-box
+    }
+
+    body {
+      margin: 0;
+      font-family: system-ui, -apple-system, "Noto Sans JP", sans-serif;
+      background: #f5f7fb;
+      color: #172033
+    }
+
+    .app {
+      max-width: 760px;
+      margin: auto;
+      min-height: 100vh;
+      padding: 20px
+    }
+
+    .card {
+      background: white;
+      border-radius: 22px;
+      padding: 28px;
+      box-shadow: 0 8px 30px #00000010
+    }
+
+    h1 {
+      margin: 0 0 8px;
+      font-size: 32px
+    }
+
+    h2 {
+      margin-top: 0
+    }
+
+    .sub {
+      color: #667085
+    }
+
+    button {
+      border: 0;
+      border-radius: 14px;
+      padding: 15px 20px;
+      font-size: 17px;
+      font-weight: 700;
+      cursor: pointer;
+      background: #172033;
+      color: white
+    }
+
+    button.secondary {
+      background: #e9edf5;
+      color: #172033
+    }
+
+    button:disabled {
+      opacity: .45;
+      cursor: not-allowed
+    }
+
+    .screen {
+      display: none
+    }
+
+    .screen.active {
+      display: block
+    }
+
+    .center {
+      text-align: center
+    }
+
+    .big {
+      font-size: 76px;
+      font-weight: 800;
+      margin: 30px 0 10px
+    }
+
+    .options {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 12px;
+      margin: 22px 0
+    }
+
+    .option {
+      padding: 18px;
+      border: 2px solid #e4e7ec;
+      border-radius: 16px;
+      cursor: pointer;
+      text-align: center
+    }
+
+    .option.selected {
+      border-color: #172033;
+      background: #f0f3f8
+    }
+
+    .option strong {
+      display: block;
+      font-size: 20px
+    }
+
+    .breath {
+      width: 180px;
+      height: 180px;
+      border-radius: 50%;
+      margin: 28px auto;
+      display: grid;
+      place-items: center;
+      background: #e5eaf3;
+      transition: transform 4s ease-in-out
+    }
+
+    .breath.inhale {
+      transform: scale(1.35)
+    }
+
+    .breath.exhale {
+      transform: scale(.78)
+    }
+
+    #target {
+      width: 100%;
+      height: 260px;
+      border-radius: 22px;
+      background: #e9edf5;
+      display: grid;
+      place-items: center;
+      font-size: 52px;
+      font-weight: 900;
+      user-select: none;
+      touch-action: manipulation
+    }
+
+    #target.ready {
+      background: #172033;
+      color: white
+    }
+
+    #target.red {
+      background: #ef4444;
+      color: white
+    }
+
+    #target.blue {
+      background: #3b82f6;
+      color: white
+    }
+
+    #target.yellow {
+      background: #f5c542;
+      color: #172033
+    }
+
+    #answerButtons {
+      margin: 18px 0 12px
+    }
+
+    #answerButtons.hidden {
+      visibility: hidden
+    }
+
+    .answer {
+      min-width: 110px;
+      touch-action: manipulation
+    }
+
+    .answer[data-color="red"] {
+      background: #ef4444
+    }
+
+    .answer[data-color="blue"] {
+      background: #3b82f6
+    }
+
+    .answer[data-color="yellow"] {
+      background: #f5c542;
+      color: #172033
+    }
+
+    .result {
+      font-size: 42px;
+      font-weight: 800;
+      margin: 10px
+    }
+
+    .row {
+      display: flex;
+      gap: 10px;
+      justify-content: center;
+      flex-wrap: wrap
+    }
+
+    .stat {
+      padding: 16px;
+      border-radius: 16px;
+      background: #f5f7fb;
+      min-width: 130px
+    }
+
+    .stat b {
+      display: block;
+      font-size: 25px;
+      margin-top: 4px
+    }
+
+    .progress {
+      height: 9px;
+      background: #e9edf5;
+      border-radius: 99px;
+      overflow: hidden;
+      margin: 18px 0
+    }
+
+    .bar {
+      height: 100%;
+      width: 0;
+      background: #172033;
+      transition: width .2s
+    }
+
+    .note {
+      font-size: 14px;
+      color: #667085;
+      line-height: 1.7;
+      margin-top: 18px
+    }
+
+    @media(max-width:560px) {
+      .app {
+        padding: 12px
+      }
+
+      .card {
+        padding: 20px
+      }
+
+      h1 {
+        font-size: 27px
+      }
+
+      .options {
+        grid-template-columns: 1fr
+      }
+
+      .big {
+        font-size: 60px
+      }
+
+      #target {
+        height: 260px
+      }
+    }
+  </style>
+</head>
+
+<body>
+  <div class="app">
+
+    <section id="home" class="screen active">
+      <div class="card">
+        <h1>🫁 呼吸 × 反応速度</h1>
+        <p class="sub">呼吸を変えると、反応の速さは変わる？</p>
+        <p>まず普通の呼吸で反応速度を測り、そのあと好きな呼吸法を体験してもう一度測定します。<br>色を見分け、毎回場所が変わるボタンを探して押す「選択反応課題」です。</p>
+        <button onclick="startBaseline()">実験スタート</button>
+        <p class="note">※これは科学体験用の試作品です。測定結果から自律神経や覚醒度の変化を断定するものではありません。</p>
+      </div>
+    </section>
+
+    <section id="reverse" class="screen">
+      <div class="box">
+        <button onclick="start()">正順で始める</button>
+        <button onclick="start_r()">逆順で始める</button>
+      </div>
+    </section>
+
+    <section id="measureIntro" class="screen">
+      <div class="card center">
+        <h2 id="introTitle">基準測定</h2>
+        <p id="introText">普段どおりに呼吸しながら測定します。色が表示されたら、対応する色のボタンをできるだけ早く押してください。</p>
+        <button onclick="beginTrials()">測定開始</button>
+      </div>
+    </section>
+
+    <section id="measure" class="screen">
+      <div class="card center">
+        <p id="trialLabel">1 / 5</p>
+        <div class="progress">
+          <div class="bar" id="bar"></div>
+        </div>
+        <div id="target">準備</div>
+        <p id="measureMessage">最初だけ「開始」を押してください。その後は自動で次の試行に進みます。</p>
+        <div class="row hidden" id="answerButtons">
+          <button class="answer" data-color="red" onclick="answer('red')">赤</button>
+          <button class="answer" data-color="blue" onclick="answer('blue')">青</button>
+          <button class="answer" data-color="yellow" onclick="answer('yellow')">黄</button>
+        </div>
+        <button id="startButton" onclick="startTrial()">開始</button>
+      </div>
+    </section>
+
+    <section id="breathSelect" class="screen">
+      <div class="card">
+        <h2>呼吸法を選ぼう</h2>
+        <p class="sub">どれか1つを選んで約1分体験します。</p>
+        <div class="options">
+          <div class="option" onclick="chooseBreath('長呼気丹田呼吸法','お腹を意識しながら、4秒吸って8秒かけてゆっくり吐きます。')">
+            <strong>長呼気丹田呼吸法</strong><small>4秒吸う・8秒吐く</small></div>
+          <div class="option" onclick="chooseBreath('4-4-4','4秒吸う → 4秒止める → 4秒吐く')">
+            <strong>4-4-4</strong><small>4秒・4秒・4秒</small></div>
+          <div class="option" onclick="chooseBreath('4-7-8','4秒吸う → 7秒止める → 8秒吐く')">
+            <strong>4-7-8</strong><small>4秒・7秒・8秒</small></div>
+        </div>
+        <p id="breathDesc" class="note">呼吸法を選択してください。</p>
+      </div>
+
+      <button class="secondary" onclick="show('reverse');reset();">最初に戻る</button>
+    </section>
+
+    <section id="breathIntro" class="screen">
+      <div class="card center">
+        <h2>呼吸法の準備</h2>
+        <p id="breathIntroName" class="sub">呼吸法</p>
+        <p id="breathIntroDesc">選んだ呼吸法を1分間体験します。</p>
+        <button onclick="startBreathing()">開始</button>
+        <button class="secondary" onclick="show('breathSelect')">呼吸法を選び直す</button>
+      </div>
+    </section>
+
+    <section id="breathIntro_b" class="screen">
+      <div class="card center">
+        <h2>通常呼吸</h2>
+        <p>1分間リラックスしてください</p>
+        <button onclick="startBreathing_b()">開始</button>
+      </div>
+    </section>
+
+    <section id="breathing" class="screen">
+      <div class="card center">
+        <h2 id="breathName">呼吸</h2>
+        <p id="breathInstruction">準備</p>
+        <div class="breath" id="breathCircle">🫁</div>
+        <p><b id="breathCount">60</b> 秒</p>
+        <button class="secondary" onclick="skipBreathing()">呼吸を終了</button>
+      </div>
+    </section>
+
+    <section id="breathing_b" class="screen">
+      <div class="card center">
+        <h2>呼吸</h2>
+        <div class="breath" id="breathCircle_b">🫁</div>
+        <p><b id="breathCount_b">60</b>秒</p>
+        <button class="secondary" onclick="skipBreathing()">呼吸を終了</button>
+      </div>
+    </section>
+
+    <section id="afterBreathIntro" class="screen">
+      <div class="card center">
+        <h2>呼吸が終わりました</h2>
+        <p id="afterBreathText">これから、呼吸後の反応速度を5回測定します。</p>
+        <p class="note">準備ができたら「測定開始」を押してください。ボタンを押すまで測定は始まりません。</p>
+        <button onclick="beginTrials()">測定開始</button>
+      </div>
+    </section>
+
+    <section id="result" class="screen">
+      <div class="card center">
+        <h2>実験結果</h2>
+        <div class="row">
+          <div class="stat">普通の呼吸法<b id="baseResult">--</b></div>
+          <div class="stat" id="afterBox"><span id="afterLabel">選択した呼吸法</span><b id="afterResult">--</b></div>
+        </div>
+        <div class="result" id="change">--</div>
+        <p id="resultText"></p>
+        <button onclick="show('reverse');reset();">もう一度実験する</button>
+        <p class="note">速くなった・遅くなったという結果は、体調、集中状態、練習効果など様々な要因の影響を受けます。この体験だけで「呼吸法が反応速度を改善した」とは判断できません。</p>
+      </div>
+    </section>
+
+  </div>
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script>
+    const supabaseClient = window.supabase.createClient(
+      "https://gvqsyscxqocnswxrfbif.supabase.co",
+      "sb_publishable_wEK-1CWE2Lcmr570BOLb7w_VCggTgGd"
+    )
+
+    let defaultBreath = [4];
+    let experimentBreath = [4];
+
+    let count = 0;
+    const TRIALS = 5;
+    let mode = "baseline";
+    let trial = 0, times = [], baseAvg = null, breathType = "", breathDesc = "", timer = null, breathCountdown = null, trialTimer = null, startTime = 0, waiting = false, correctCount = 0, mistakeCount = 0, falseStartCount = 0, reverse = false;
+    let baseAccuracy = null, baseMistakes = 0, baseFalseStarts = 0;
+    let participantCode = "";
+
+    function show(id) { document.querySelectorAll(".screen").forEach(x => x.classList.remove("active")); document.getElementById(id).classList.add("active") }
+    function avg(a) { return a.reduce((x, y) => x + y, 0) / a.length }
+    function startBaseline() {
+      const code = prompt("ニックネームを入力してください");
+
+      if (code === null) return;
+
+      participantCode = code.trim();
+
+      if (participantCode.length < 1 || participantCode.length > 30) {
+        alert("ニックネームは1〜30文字で入力してください。");
+        return;
+      }
+      document.querySelectorAll(".option").forEach(x =>
+        x.classList.remove("selected")
+      );
+
+      document.getElementById("breathDesc").textContent =
+        "呼吸法を選択してください。";
+
+      document.getElementById("introTitle").textContent = "基準測定";
+      document.getElementById("introText").textContent =
+        "普段どおりに呼吸しながら、同じ選択反応課題を5回行います。";
+
+      show("reverse");
+      //show("measureIntro");
+    }
+    function start() {
+      reverse = false;
+      show("measureIntro");
+    }
+    function start_r() {
+      reverse = true;
+      show("breathSelect");
+    }
+    function reset() {
+      //mode = "baseline";
+      count = 0;
+      times = [];
+      baseAvg = null;
+      breathType = "";
+      breathDesc = "";
+
+      clearInterval(timer);
+      clearInterval(breathCountdown);
+      clearTimeout(trialTimer);
+
+      timer = null;
+      breathCountdown = null;
+    }
+    function beginTrials() {
+      trial = 0; times = []; correctCount = 0; mistakeCount = 0; falseStartCount = 0;
+      // 次の測定を開始するとき、「開始」ボタンを再び有効化
+      document.getElementById("startButton").disabled = false;
+      show("measure"); updateProgress(); resetTarget();
+    }
+    function updateProgress() { document.getElementById("trialLabel").textContent = `${trial + 1} / ${TRIALS}`; document.getElementById("bar").style.width = (trial / TRIALS * 100) + "%" }
+    function shuffleAnswerButtons() {
+      const box = document.getElementById("answerButtons");
+      const buttons = [...box.querySelectorAll(".answer")];
+      for (let i = buttons.length - 1; i > 0; i--) {
+        const j = Math.floor(Math.random() * (i + 1));
+        [buttons[i], buttons[j]] = [buttons[j], buttons[i]];
+      }
+      buttons.forEach(b => box.appendChild(b));
+    }
+
+    function resetTarget() {
+      let t = document.getElementById("target");
+      t.className = ""; t.textContent = "準備";
+      document.getElementById("measureMessage").textContent = "2秒後に次の試行が始まります";
+      document.querySelectorAll(".answer").forEach(b => b.disabled = true);
+      document.getElementById("answerButtons").classList.add("hidden");
+    }
+
+    function registerFalseStart() {
+      if (!waiting) return;
+      clearTimeout(trialTimer);
+      waiting = false; startTime = 0;
+      falseStartCount++;
+      trial++;
+      document.getElementById("target").className = "ready";
+      document.getElementById("target").textContent = "フライング！";
+      document.getElementById("measureMessage").textContent = "色が出る前のタップをフライングとしてカウントしました。";
+      document.querySelectorAll(".answer").forEach(b => b.disabled = true);
+      document.getElementById("answerButtons").classList.add("hidden");
+      document.getElementById("bar").style.width = (trial / TRIALS * 100) + "%";
+      nextTrial();
+    }
+
+    document.getElementById("target").addEventListener("pointerdown", registerFalseStart);
+
+    function startTrial() {
+      document.getElementById("startButton").disabled = true;
+      document.querySelectorAll(".answer").forEach(b => b.disabled = true);
+      document.getElementById("answerButtons").classList.add("hidden");
+      waiting = true; early = false;
+      let t = document.getElementById("target");
+      t.className = "ready"; t.textContent = "待って…";
+      document.getElementById("measureMessage").textContent = "色が出るまで待って！";
+      let delay = 2000 + Math.random() * 3000;//待ち時間の変更
+      trialTimer = setTimeout(() => showColor(), delay);
+    }
+
+    function showColor() {
+      waiting = false;
+      const colors = [["red", "赤"], ["blue", "青"], ["yellow", "黄"]];
+      const c = colors[Math.floor(Math.random() * 3)];
+      const t = document.getElementById("target");
+      t.className = c[0]; t.textContent = c[1];
+      shuffleAnswerButtons();
+      document.getElementById("answerButtons").classList.remove("hidden");
+      startTime = performance.now();
+      document.getElementById("measureMessage").textContent = "色を確認 → 対応するボタンを探す → 押して！";
+      document.querySelectorAll(".answer").forEach(b => b.disabled = false);
+    }
+
+    function nextTrial() {
+      if (trial < TRIALS) {
+        setTimeout(() => {
+          updateProgress();
+          resetTarget();
+          setTimeout(startTrial, 2000);
+        }, 2000);
+      } else {
+        document.getElementById("bar").style.width = "100%";
+        setTimeout(finishMeasure, 2000);
+      }
+    }
+
+    function answer(selected) {
+      if (startTime === 0) return;
+
+      const ms = performance.now() - startTime;
+      const targetClass = document.getElementById("target").className;
+      startTime = 0;
+      trial++;
+      document.querySelectorAll(".answer").forEach(b => b.disabled = true);
+      document.getElementById("answerButtons").classList.add("hidden");
+
+      if (selected !== targetClass) {
+        mistakeCount++;
+        document.getElementById("measureMessage").textContent = "不正解としてカウントしました。";
+        nextTrial();
+        return;
+      }
+
+      correctCount++;
+      times.push(ms);
+      document.getElementById("measureMessage").textContent = `正解！ ${Math.round(ms)} ms`;
+      nextTrial();
+    }
+
+    async function finishMeasure() {
+      let a = times.length ? Math.round(avg(times)) : null;
+      let accuracy = Math.round(correctCount / TRIALS * 100);
+      let speedScore = a ? 1000 / a : 0;
+      let composite = Math.round(speedScore * (accuracy / 100) * 100) / 100;
+
+      //if((mode == "baseline" && reverse == false)||(mode != "baseLine" && reverse == true))
+      if (count == 0) {
+        count += 1;
+        /*baseAvg = a;
+        baseAccuracy = accuracy;
+        baseMistakes = mistakeCount;
+        baseFalseStarts = falseStartCount;*/
+        if(!reverse){
+          defaultBreath[0] = a;
+          defaultBreath[1] = accuracy;
+          defaultBreath[2] = mistakeCount;
+          defaultBreath[3] = falseStartCount;
+        }
+        else
+        {
+          experimentBreath[0] = a;
+          experimentBreath[1] = accuracy;
+          experimentBreath[2] = mistakeCount;
+          experimentBreath[3] = falseStartCount;
+        }
+        if (!reverse) show("breathSelect");
+        else show("breathIntro_b");
+      } else {
+
+        if(reverse){
+          defaultBreath[0] = a;
+          defaultBreath[1] = accuracy;
+          defaultBreath[2] = mistakeCount;
+          defaultBreath[3] = falseStartCount;
+        }
+        else
+        {
+          experimentBreath[0] = a;
+          experimentBreath[1] = accuracy;
+          experimentBreath[2] = mistakeCount;
+          experimentBreath[3] = falseStartCount;
+        }
+
+        document.getElementById("afterLabel").textContent = breathType || "選択した呼吸法";
+        document.getElementById("baseResult").textContent = defaultBreath[0] !== null ? defaultBreath[0] + " ms" : "測定不能";
+        document.getElementById("afterResult").textContent = experimentBreath[0] !== null ? experimentBreath[0] + " ms" : "測定不能";
+      
+        const d = (defaultBreath[0] !== null && experimentBreath[0] !== null) ? defaultBreath[0] - experimentBreath[0] : null;
+        const pct = (d !== null && defaultBreath[0]) ? d / defaultBreath[0] * 100 : null;
+        const { error } = await supabaseClient
+          .from("experiment_results")
+          .insert({
+            participant_code: participantCode,
+            breath_method: breathType,
+            baseline_ms: defaultBreath[0],
+            after_ms: experimentBreath[0],
+            baseline_accuracy: defaultBreath[1],
+            after_accuracy: experimentBreath[1],
+            baseline_mistakes: defaultBreath[2],
+            after_mistakes: experimentBreath[2],
+            baseline_false_starts: defaultBreath[3],
+            after_false_starts: experimentBreath[3],
+            reverse_bool: reverse
+          });
+
+        if (error) {
+          console.error("保存エラー:", error);
+          document.getElementById("resultText").textContent =
+            "実験結果を表示しましたが、データの保存に失敗しました。もう一度試してください。";
+        } else {
+          document.getElementById("resultText").textContent +=
+            "\nデータベースへの保存が完了しました。";
+        }
+
+        document.getElementById("change").textContent =
+          d !== null ? ((d >= 0 ? "⚡ " : "") + Math.abs(d) + " ms " + (d >= 0 ? "速くなりました" : "遅くなりました")) : "比較できません";
+
+        document.getElementById("resultText").innerHTML =
+          `<b>普通の呼吸法</b>：正解率 ${defaultBreath[1]}% ／ ミス ${defaultBreath[2]}回 ／ フライング ${defaultBreath[3]}回<br>` +
+          `<b>${breathType}</b>：正解率 ${experimentBreath[1]}% ／ ミス ${experimentBreath[2]}回 ／ フライング ${experimentBreath[3]}回<br>` +
+          `変化率：${pct !== null ? pct.toFixed(1) + "%" : "比較不能"}（プラスは速くなったことを表します）<br>` +
+          `逆順：${reverse}（呼吸後の速さ×正解率。科学的な標準指標ではありません）`;
+
+        show("result");
+      }
+    }
+
+    function chooseBreath(name, desc) {
+      breathType = name;
+      breathDesc = desc;
+      document.querySelectorAll(".option").forEach(x => x.classList.remove("selected"));
+      [...document.querySelectorAll(".option")]
+        .find(x => x.textContent.includes(name))?.classList.add("selected");
+      document.getElementById("breathDesc").textContent = desc;
+
+      // 選択後はいったん確認画面へ進み、そこで「開始」を1回押す
+      document.getElementById("breathIntroName").textContent = name;
+      document.getElementById("breathIntroDesc").textContent = desc + " 1分間行ったあと、呼吸後の測定に進みます。";
+      show("breathIntro");
+    }
+    function startBreathing() {
+      if (!breathType) {
+        show("breathSelect");
+        return;
+      }
+
+      clearInterval(timer);
+      clearInterval(breathCountdown);
+      timer = null;
+      breathCountdown = null;
+
+      show("breathing");
+      document.getElementById("breathName").textContent = breathType;
+      let phase = 0;
+      const pattern = breathType === "4-4-4"
+        ? [{ label: "吸う", sec: 4, cls: "inhale" }, { label: "止める", sec: 4, cls: "" }, { label: "吐く", sec: 4, cls: "exhale" }]
+        : breathType === "4-7-8"
+          ? [{ label: "吸う", sec: 4, cls: "inhale" }, { label: "止める", sec: 7, cls: "" }, { label: "吐く", sec: 8, cls: "exhale" }]
+          : [{ label: "吸う", sec: 4, cls: "inhale" }, { label: "吐く", sec: 8, cls: "exhale" }];
+      const cycle = pattern.reduce((n, p) => n + p.sec, 0);
+
+      function updateBreath() {
+        const pos = phase % cycle;
+        let acc = 0, current = pattern[0];
+        for (const p of pattern) {
+          if (pos < acc + p.sec) { current = p; break; }
+          acc += p.sec;
+        }
+        document.getElementById("breathInstruction").textContent = current.label;
+        document.getElementById("breathCircle").className = "breath " + current.cls;
+        phase++;
+      }
+
+      clearInterval(timer); clearInterval(breathCountdown);
+      updateBreath();
+      timer = setInterval(updateBreath, 1000);
+      let sec = 60;
+      document.getElementById("breathCount").textContent = sec;
+      breathCountdown = setInterval(() => {
+        sec--;
+        document.getElementById("breathCount").textContent = Math.max(sec, 0);
+        if (sec <= 0) finishBreathing();
+      }, 1000);
+    }
+
+    function startBreathing_b() {
+
+      clearInterval(timer);
+      clearInterval(breathCountdown);
+
+      timer = null;
+      breathCountdown = null;
+
+      show("breathing_b");
+
+      let sec_b = 60;
+
+      document.getElementById("breathCount_b").textContent = sec_b;
+
+      breathCountdown = setInterval(() => {
+        sec_b--;
+
+        document.getElementById("breathCount_b").textContent = Math.max(sec_b, 0);
+
+        if (sec_b <= 0) finishBreathing();
+
+      }, 1000);
+    }
+
+    function finishBreathing() {
+      clearInterval(timer);
+      clearInterval(breathCountdown);
+      timer = null;
+      breathCountdown = null;
+      //mode="after";
+      if (reverse == false) document.getElementById("afterBreathText").textContent =
+        `${breathType}を1分間体験しました。これから、呼吸後の「色の認識 → ボタン位置の確認 → タップ」の選択反応課題を5回行います。`;
+      show("afterBreathIntro");
+    }
+
+    function skipBreathing() { finishBreathing() }
+
+    function startDebug() { }
+  </script>
+</body>
+
+</html>
