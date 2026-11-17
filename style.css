@@ -1,0 +1,27 @@
+*{box-sizing:border-box}body{margin:0;font-family:system-ui,-apple-system,"Noto Sans JP",sans-serif;background:#f5f7fb;color:#172033}
+.app{max-width:760px;margin:auto;min-height:100vh;padding:20px}
+.card{background:white;border-radius:22px;padding:28px;box-shadow:0 8px 30px #00000010}
+h1{margin:0 0 8px;font-size:32px}h2{margin-top:0}.sub{color:#667085}
+button{border:0;border-radius:14px;padding:15px 20px;font-size:17px;font-weight:700;cursor:pointer;background:#172033;color:white}
+button.secondary{background:#e9edf5;color:#172033}button:disabled{opacity:.45;cursor:not-allowed}
+.screen{display:none}.screen.active{display:block}
+.center{text-align:center}.big{font-size:76px;font-weight:800;margin:30px 0 10px}
+.options{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin:22px 0}
+.option{padding:18px;border:2px solid #e4e7ec;border-radius:16px;cursor:pointer;text-align:center}
+.option.selected{border-color:#172033;background:#f0f3f8}.option strong{display:block;font-size:20px}
+.breath{width:180px;height:180px;border-radius:50%;margin:28px auto;display:grid;place-items:center;background:#e5eaf3;transition:transform 4s ease-in-out}
+.breath.inhale{transform:scale(1.35)}.breath.exhale{transform:scale(.78)}
+#target{width:100%;height:260px;border-radius:22px;background:#e9edf5;display:grid;place-items:center;font-size:52px;font-weight:900;user-select:none;touch-action:manipulation}
+#target.ready{background:#172033;color:white}
+#target.red{background:#ef4444;color:white}
+#target.blue{background:#3b82f6;color:white}
+#target.yellow{background:#f5c542;color:#172033}
+#answerButtons{margin:18px 0 12px}#answerButtons.hidden{visibility:hidden}
+.answer{min-width:110px;touch-action:manipulation}
+.answer[data-color="red"]{background:#ef4444}
+.answer[data-color="blue"]{background:#3b82f6}
+.answer[data-color="yellow"]{background:#f5c542;color:#172033}
+.result{font-size:42px;font-weight:800;margin:10px}.row{display:flex;gap:10px;justify-content:center;flex-wrap:wrap}.stat{padding:16px;border-radius:16px;background:#f5f7fb;min-width:130px}.stat b{display:block;font-size:25px;margin-top:4px}
+.progress{height:9px;background:#e9edf5;border-radius:99px;overflow:hidden;margin:18px 0}.bar{height:100%;width:0;background:#172033;transition:width .2s}
+.note{font-size:14px;color:#667085;line-height:1.7;margin-top:18px}
+@media(max-width:560px){.app{padding:12px}.card{padding:20px}h1{font-size:27px}.options{grid-template-columns:1fr}.big{font-size:60px}#target{height:260px}}

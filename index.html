@@ -1,0 +1,106 @@
+<!DOCTYPE html>
+<html lang="ja">
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width,initial-scale=1">
+        <link rel="stylesheet" href="style.css">
+        <title>コキュウクエスト</title>
+    </head>
+    <body>
+        <div class="app">
+
+<section id="home" class="screen active">
+<div class="card">
+<h1>🫁 呼吸 × 反応速度</h1>
+<p class="sub">呼吸を変えると、反応の速さは変わる？</p>
+<p>まず普通の呼吸で反応速度を測り、そのあと好きな呼吸法を体験してもう一度測定します。<br>色を見分け、毎回場所が変わるボタンを探して押す「選択反応課題」です。</p>
+<button onclick="startBaseline()">実験スタート</button>
+<p class="note">※これは科学体験用の試作品です。測定結果から自律神経や覚醒度の変化を断定するものではありません。</p>
+</div>
+</section>
+
+<section id="measureIntro" class="screen">
+<div class="card center">
+<h2 id="introTitle">基準測定</h2>
+<p id="introText">普段どおりに呼吸しながら測定します。色が表示されたら、対応する色のボタンをできるだけ早く押してください。</p>
+<button onclick="beginTrials()">測定開始</button>
+</div>
+</section>
+
+<section id="measure" class="screen">
+<div class="card center">
+<p id="trialLabel">1 / 5</p>
+<div class="progress"><div class="bar" id="bar"></div></div>
+<div id="target">準備</div>
+<p id="measureMessage">最初だけ「開始」を押してください。その後は自動で次の試行に進みます。</p>
+<div class="row hidden" id="answerButtons">
+<button class="answer" data-color="red" onclick="answer('red')">赤</button>
+<button class="answer" data-color="blue" onclick="answer('blue')">青</button>
+<button class="answer" data-color="yellow" onclick="answer('yellow')">黄</button>
+</div>
+<button id="startButton" onclick="startTrial()">開始</button>
+</div>
+</section>
+
+<section id="breathSelect" class="screen">
+<div class="card">
+<h2>呼吸法を選ぼう</h2>
+<p class="sub">どれか1つを選んで約1分体験します。</p>
+<div class="options">
+<div class="option" onclick="chooseBreath('長呼気丹田呼吸法','お腹を意識しながら、4秒吸って8秒かけてゆっくり吐きます。')"><strong>長呼気丹田呼吸法</strong><small>4秒吸う・8秒吐く</small></div>
+<div class="option" onclick="chooseBreath('4-4-4','4秒吸う → 4秒止める → 4秒吐く')"><strong>4-4-4</strong><small>4秒・4秒・4秒</small></div>
+<div class="option" onclick="chooseBreath('4-7-8','4秒吸う → 7秒止める → 8秒吐く')"><strong>4-7-8</strong><small>4秒・7秒・8秒</small></div>
+</div>
+<p id="breathDesc" class="note">呼吸法を選択してください。</p>
+</div>
+
+<button class="secondary" onclick="show('home')">最初に戻る</button>
+</section>
+
+<section id="breathIntro" class="screen">
+<div class="card center">
+<h2>呼吸法の準備</h2>
+<p id="breathIntroName" class="sub">呼吸法</p>
+<p id="breathIntroDesc">選んだ呼吸法を1分間体験します。</p>
+<button onclick="startBreathing()">開始</button>
+<button class="secondary" onclick="show('breathSelect')">呼吸法を選び直す</button>
+</div>
+</section>
+
+<section id="breathing" class="screen">
+<div class="card center">
+<h2 id="breathName">呼吸</h2>
+<p id="breathInstruction">準備</p>
+<div class="breath" id="breathCircle">🫁</div>
+<p><b id="breathCount">60</b> 秒</p>
+<button class="secondary" onclick="skipBreathing()">呼吸を終了</button>
+</div>
+</section>
+
+<section id="afterBreathIntro" class="screen">
+<div class="card center">
+<h2>呼吸が終わりました</h2>
+<p id="afterBreathText">これから、呼吸後の反応速度を5回測定します。</p>
+<p class="note">準備ができたら「測定開始」を押してください。ボタンを押すまで測定は始まりません。</p>
+<button onclick="beginTrials()">測定開始</button>
+</div>
+</section>
+
+<section id="result" class="screen">
+<div class="card center">
+<h2>実験結果</h2>
+<div class="row">
+<div class="stat">普通の呼吸法<b id="baseResult">--</b></div>
+<div class="stat" id="afterBox"><span id="afterLabel">選択した呼吸法</span><b id="afterResult">--</b></div>
+</div>
+<div class="result" id="change">--</div>
+<p id="resultText"></p>
+<button onclick="show('home')">もう一度実験する</button>
+<p class="note">速くなった・遅くなったという結果は、体調、集中状態、練習効果など様々な要因の影響を受けます。この体験だけで「呼吸法が反応速度を改善した」とは判断できません。</p>
+</div>
+</section>
+
+</div>
+        <script src="script.js"></script>
+    </body>
+</html>
