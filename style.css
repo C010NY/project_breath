@@ -7,7 +7,8 @@
       margin: 0;
       font-family: system-ui, -apple-system, "Noto Sans JP", sans-serif;
       background: #f5f7fb;
-      color: #172033
+      color: #172033;
+      overflow: hidden;
     }
 
     .base
@@ -17,6 +18,7 @@
       aspect-ratio: 16 / 9;
       background: white;
       box-shadow: 0 8px 30px #00000010;
+      /*position: fixed;　常時表示しておきたいButtonなどに追加*/
     }
 
     .app {
@@ -27,8 +29,6 @@
       display: flex;
       justify-content: center;
       align-items: center;
-      position: sticky;
-      top: 0;
     }
 
     .card {
