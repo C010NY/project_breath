@@ -9,6 +9,7 @@
       background: #f5f7fb;
       color: #172033;
       overflow: hidden;
+      touch-action: none;
     }
 
     .base
