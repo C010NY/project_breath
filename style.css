@@ -258,7 +258,7 @@
     }
 
     @media(max-width:560px) {
-      .bace{
+      .base{
         width: 80%;
       }
       .app {
