@@ -256,6 +256,9 @@
     }
 
     @media(max-width:560px) {
+      .base{
+        width: 80%;
+      }
       .app {
         padding: 12px
       }
