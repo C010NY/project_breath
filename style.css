@@ -257,7 +257,10 @@
       transition: border-color 0.2s,background-color 0.2s;
     }
 
-    @media(max-width:1000px) {
+    @media(max-width:560px) {
+      .bace{
+        width: 80%;
+      }
       .app {
         padding: 12px
       }
