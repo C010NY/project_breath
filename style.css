@@ -257,7 +257,7 @@
       transition: border-color 0.2s,background-color 0.2s;
     }
 
-    @media(max-width:560px) {
+    @media(max-height:560px) {
       .base{
         width: 80%;
       }
