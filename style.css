@@ -10,11 +10,23 @@
       color: #172033
     }
 
+    .base
+    {
+      width: 100%;
+      height: auto;
+      aspect-ratio: 16 / 9;
+      background: white;
+      box-shadow: 0 8px 30px #00000010;
+    }
+
     .app {
-      max-width: 760px;
+      max-width: 1000px;
       margin: auto;
       min-height: 100vh;
-      padding: 20px
+      padding: 20px;
+      display: flex;
+      justify-content: center;
+      align-items: center;
     }
 
     .card {
